@@ -1,49 +1,20 @@
+
+import subprocess
+import sys
 import os
-import platform
+from importlib.resources import files
 
-_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def run_chromedriver():
+    is_windows = sys.platform.startswith("win")
+    binary_name = "chromedriver.exe" if is_windows else "chromedriver"
+    binary_path = files('chromedriver_py').joinpath(binary_name)
 
+    if not binary_path.exists():
+        raise FileNotFoundError(f"Could not find chromedriver binary at {binary_path}")
 
-
-def _get_filename():
-    path = os.path.join(_BASE_DIR, "chromedriver_")
-
-    machine = platform.machine().lower()
-    sys = platform.system().lower()
-
-    # windows
-    if sys == "windows":
-        if machine.endswith("64"):
-            path += "win64.exe"
-        else:
-            path += "win32.exe"
-
-    # mac
-    elif sys == "darwin":
-        path += "mac"
-        if "arm" in machine:
-            path += "-arm64"
-        else:
-            path += "-x64"
-
-    # linux
-    elif sys == "linux":
-        if "arm" in machine:
-            raise Exception("Google doesn't compile chromedriver versions for Linux ARM. Sorry!")
-        if machine.endswith("32"):
-            raise Exception("Google doesn't compile 32bit chromedriver versions for Linux. Sorry!")
-        path += "linux64"
-
-    # undefined
-    else:
-        raise Exception("Could not identify your system: " + sys)
-
-    if not path or not os.path.isfile(path):
-        msg = "Couldn't find a binary for your system: " + sys + " / " + machine + ". "
-        msg += "Please create an Issue on github.com/breuerfelix/chromedriver-py and include this Message."
-        raise Exception(msg)
-
-    return path
-
-
-binary_path = _get_filename()
+    try:
+        result = subprocess.run([str(binary_path)] + sys.argv[1:], check=False)
+        sys.exit(result.returncode)
+    except OSError as e:
+        print(f"Error executing chromedriver: {e}")
+        sys.exit(1)

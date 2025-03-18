@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chromedriver-py"
+dynamic = ["version"]  # Use dynamic version again
+description = "chromedriver binaries for all platforms"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Operating System :: OS Independent",
+]
+keywords = ["chromedriver", "cross-platform", "binaries", "binary"]
+dependencies = []
+authors = [
+    {name = "Felix Breuer", email = "fbreuer@pm.me"},
+]
+[project.urls]
+Homepage = "http://github.com/breuerfelix/chromedriver-py"
+
+[project.scripts]
+chromedriver = "chromedriver_py:run_chromedriver"
+
+[dependency-groups]
+dev = [
+    "build",
+    "requests"
+]
+
+[tool.setuptools]
+packages = ["chromedriver_py"]
+
+
+[tool.setuptools.dynamic]
+version = {file = "CURRENT_VERSION.txt"}
